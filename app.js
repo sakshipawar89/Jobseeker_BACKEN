@@ -2,37 +2,41 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config(); // Load environment variables
+require('dotenv').config();
 
 const app = express();
 const routes = require('./routing');
 
-// Middleware
+// ✅ Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Configure CORS for Vercel frontend
+// ✅ Corrected CORS (spelling fixed)
 app.use(cors({
-  origin: "https://jobseeker-forntend.vercel.app",
+  origin: "https://jobseeker-frontend.vercel.app", // Make sure this matches your Vercel frontend
   credentials: true
 }));
 
-// Serve uploaded CVs or images
+// ✅ Preflight request support
+app.options('*', cors());
+
+// ✅ Static folder for uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// MongoDB connection
+// ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
-  .then(() => console.log("DATABASE CONNECTED..."))
-  .catch((error) => console.log("Database connection error:", error));
+  .then(() => console.log("✅ DATABASE CONNECTED..."))
+  .catch((error) => console.log("❌ Database connection error:", error));
 
-// API routes
+// ✅ API routes
 app.use('/', routes);
 
-// Root health check route
+// ✅ Health check
 app.get('/', (req, res) => {
   res.send('Job Portal Backend is up and running!');
 });
 
-// Start server
+// ✅ Start server
 const PORT = process.env.PORT || 8000;
-app.listen(PORT, () => console.log(`SERVER IS RUNNING on port ${PORT}...`));
+app.listen(PORT, () => console.log(`🚀 SERVER RUNNING on port ${PORT}...`));
+
