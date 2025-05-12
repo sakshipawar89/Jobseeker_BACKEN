@@ -1,5 +1,5 @@
 const User = require('./modal');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');git add .
 const jwt = require('jsonwebtoken');
 
 const jwtKey = 'e-comm';
