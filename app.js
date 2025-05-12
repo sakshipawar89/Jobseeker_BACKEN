@@ -14,7 +14,7 @@ app.use(express.json());
 // ✅ CORS Configuration
 const allowedOrigins = [
   'https://jobseeker-forntend.vercel.app',
-  'https://jobseeker-forntend-t1ua.vercel.app',
+  
 ];
 
 app.use(cors({
