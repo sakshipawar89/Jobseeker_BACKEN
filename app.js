@@ -13,7 +13,7 @@ app.use(express.json());
 
 // ✅ Corrected CORS (spelling fixed)
 app.use(cors({
-  origin: "https://jobseeker-forntend.vercel.app", // Make sure this matches your Vercel frontend
+  origin: "https://jobseeker-forntend-f1ik.vercel.app/", // Make sure this matches your Vercel frontend
   credentials: true
 }));
 
