@@ -10,7 +10,12 @@ const routes = require('./routing');
 // Middleware
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
-app.use(cors());
+
+// ✅ Configure CORS for Vercel frontend
+app.use(cors({
+  origin: "https://jobseeker-forntend.vercel.app",
+  credentials: true
+}));
 
 // Serve uploaded CVs or images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
