@@ -14,8 +14,7 @@ app.use(express.json());
 // ✅ Corrected CORS (spelling fixed)
 app.use(cors({
   origin: [
-    'https://jobseeker-forntend-f1ik.vercel.app',
-    'https://jobseeker-forntend-f1ik-git-main-sakshipawar89s-projects.vercel.app'
+    'https://jobseeker-forntend-g8cx5i4et-sakshipawar89s-projects.vercel.app/'
   ],
   credentials: true
 }));
