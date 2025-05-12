@@ -7,33 +7,36 @@ require('dotenv').config();
 const app = express();
 const routes = require('./routing');
 
-// ✅ Middleware
+// ✅ Middleware for parsing
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Corrected CORS (spelling fixed)
+// ✅ Fixed CORS (no trailing slash in origin)
+const allowedOrigin = 'https://jobseeker-forntend-g8cx5i4et-sakshipawar89s-projects.vercel.app';
+
 app.use(cors({
-  origin: [
-    'https://jobseeker-forntend-g8cx5i4et-sakshipawar89s-projects.vercel.app/'
-  ],
-  credentials: true
+  origin: allowedOrigin,
+  credentials: true,
 }));
 
-// ✅ Preflight request support
-app.options('*', cors());
+// ✅ Handle preflight requests correctly
+app.options('*', cors({
+  origin: allowedOrigin,
+  credentials: true,
+}));
 
-// ✅ Static folder for uploaded files
+// ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // ✅ MongoDB connection
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => console.log("✅ DATABASE CONNECTED..."))
-  .catch((error) => console.log("❌ Database connection error:", error));
+  .catch((error) => console.error("❌ Database connection error:", error));
 
 // ✅ API routes
 app.use('/', routes);
 
-// ✅ Health check
+// ✅ Health check route
 app.get('/', (req, res) => {
   res.send('Job Portal Backend is up and running!');
 });
@@ -41,4 +44,5 @@ app.get('/', (req, res) => {
 // ✅ Start server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`🚀 SERVER RUNNING on port ${PORT}...`));
+
 
