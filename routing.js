@@ -4,13 +4,9 @@ const router = express.Router();
 // Controllers
 const controller = require('./control');
 const jobcontroller = require('./jobcontroller');
-const {
-  submitApplication,
-  getApplications,
-  updateApplicationStatus,
-} = require('./Usercontroller');
 
-// Multer middleware
+
+// Multer upload middleware
 const upload = require('./fileupload');
 
 // -----------------------
@@ -21,22 +17,19 @@ router.post('/login', controller.checkLogin);
 router.get('/validuser', controller.verifyToken, controller.validUser);
 
 // -----------------------
-// 📄 Application Routes (with upload error handling)
+// 📄 Application Routes
 // -----------------------
-router.post('/applications', (req, res, next) => {
-  upload.single('cv')(req, res, function (err) {
-    if (err instanceof multer.MulterError) {
-      return res.status(400).json({ message: err.message });
-    } else if (err) {
-      return res.status(400).json({ message: err.message });
-    }
-    next();
-  });
-}, submitApplication);
 
-router.get('/getapplications', getApplications);
-router.put('/applications/:id/status', updateApplicationStatus);
+const {
+    submitApplication,
+    getApplications,
+    updateApplicationStatus,
+  } = require('./Usercontroller');
 
+  
+  router.post('/applications', upload.single('cv'), submitApplication);
+  router.get('/getapplications', getApplications);
+  router.put('/applications/:id/status', updateApplicationStatus);
 // -----------------------
 // 💼 Job Management Routes
 // -----------------------
