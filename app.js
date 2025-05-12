@@ -15,15 +15,27 @@ app.use(express.json());
 const allowedOrigin = 'https://jobseeker-forntend.vercel.app/';
 
 app.use(cors({
-  origin: allowedOrigin,
-  credentials: true,
+const cors = require('cors');
+
+const allowedOrigins = [
+  'https://jobseeker-forntend.vercel.app',
+  'https://jobseeker-forntend-t1ua.vercel.app', // <-- add this
+];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true
 }));
 
-// ✅ Handle preflight requests correctly
-app.options('*', cors({
-  origin: allowedOrigin,
-  credentials: true,
-}));
+
+
+
 
 // ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
