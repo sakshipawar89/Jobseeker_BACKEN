@@ -1,12 +1,11 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const path = require('path'); // ✅ Required for static path resolution
+const path = require('path');
+require('dotenv').config(); // ✅ Load .env first
 
 const app = express();
 const routes = require('./routing');
-
-const jwtkey = 'e-comm'; // Note: Avoid hardcoding in production — use environment variables
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
@@ -17,12 +16,16 @@ app.use(cors());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/Jobs')
-    .then(() => console.log("DATABASE CONNECTED..."))
-    .catch((error) => console.log("Database connection error:", error));
+mongoose.connect(process.env.MONGODB_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+.then(() => console.log("DATABASE CONNECTED..."))
+.catch((error) => console.log("Database connection error:", error));
 
 // Routes
 app.use('/', routes);
 
-// Server listening
-app.listen(8000, () => console.log('SERVER IS RUNNING on port 8000...'));
+// Start server
+const PORT = process.env.PORT || 8000;
+app.listen(PORT, () => console.log(`SERVER IS RUNNING on port ${PORT}...`));
