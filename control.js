@@ -1,8 +1,13 @@
 const User = require('./modal');
-const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const crypto = require('crypto');
 
 const jwtKey = 'e-comm';
+
+// Function to hash passwords using SHA-256
+const hashPassword = (password) => {
+  return crypto.createHash('sha256').update(password).digest('hex');
+};
 
 const newuser = async (req, res) => {
   try {
@@ -21,7 +26,7 @@ const newuser = async (req, res) => {
       return res.status(409).json({ msg: 'Email already registered' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const hashedPassword = hashPassword(password);
     const user = new User({ name, email, password: hashedPassword, role, company });
     const savedUser = await user.save();
 
@@ -41,8 +46,10 @@ const checkLogin = async (req, res) => {
     const user = await User.findOne({ email });
     if (!user) return res.status(401).json({ msg: 'Invalid credentials' });
 
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ msg: 'Invalid credentials' });
+    const hashedInput = hashPassword(password);
+    if (user.password !== hashedInput) {
+      return res.status(401).json({ msg: 'Invalid credentials' });
+    }
 
     jwt.sign({ userId: user._id }, jwtKey, { expiresIn: '2h' }, (err, token) => {
       if (err) return res.status(500).json({ msg: 'Token generation failed' });
@@ -57,8 +64,7 @@ const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
   if (!authHeader) return res.status(403).json({ msg: 'Token required' });
 
-  const token = authHeader.split(' ')[1]; // Extract token after 'Bearer'
-
+  const token = authHeader.split(' ')[1];
   if (!token) return res.status(403).json({ msg: 'Token malformed' });
 
   jwt.verify(token, jwtKey, (err, decoded) => {
