@@ -11,15 +11,10 @@ const routes = require('./routing');
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-// ✅ Fixed CORS (no trailing slash in origin)
-const allowedOrigin = 'https://jobseeker-forntend.vercel.app/';
-
-app.use(cors({
-const cors = require('cors');
-
+// ✅ CORS Configuration
 const allowedOrigins = [
   'https://jobseeker-forntend.vercel.app',
-  'https://jobseeker-forntend-t1ua.vercel.app', // <-- add this
+  'https://jobseeker-forntend-t1ua.vercel.app',
 ];
 
 app.use(cors({
@@ -27,15 +22,12 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin)) {
       callback(null, true);
     } else {
+      console.error(`❌ Blocked by CORS: ${origin}`);
       callback(new Error('Not allowed by CORS'));
     }
   },
   credentials: true
 }));
-
-
-
-
 
 // ✅ Serve uploaded files
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -56,5 +48,3 @@ app.get('/', (req, res) => {
 // ✅ Start server
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => console.log(`🚀 SERVER RUNNING on port ${PORT}...`));
-
-
