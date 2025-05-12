@@ -1,7 +1,7 @@
 const Application = require('./UserModal'); // adjust path if needed
 
 // @desc    Submit a new job application
-// @route   POST /api/applications
+// @route   POST /applications
 // @access  Public
 const submitApplication = async (req, res) => {
   try {
@@ -10,13 +10,18 @@ const submitApplication = async (req, res) => {
       currentPackage,
       expectedPackage,
       coverLetter,
-      jobId, // Optional if linking to a job post
+      jobId,
       applicantName,
     } = req.body;
 
+    // ✅ Basic validation
     if (!applicantType || !coverLetter || !applicantName) {
       return res.status(400).json({ message: 'Missing required fields.' });
     }
+
+    // ✅ Optional logging for debugging
+    console.log('📨 Incoming Application:', req.body);
+    console.log('📎 Uploaded File:', req.file);
 
     const applicationData = {
       applicantType,
@@ -29,7 +34,7 @@ const submitApplication = async (req, res) => {
       status: 'pending',
     };
 
-    // If CV file uploaded
+    // ✅ Handle uploaded CV
     if (req.file) {
       applicationData.cv = {
         filename: req.file.filename,
@@ -38,8 +43,12 @@ const submitApplication = async (req, res) => {
         mimetype: req.file.mimetype,
         size: req.file.size,
       };
+    } else {
+      // Optional: reject request if CV is mandatory
+      return res.status(400).json({ message: 'CV file is missing.' });
     }
 
+    // ✅ Save to database
     const newApplication = new Application(applicationData);
     await newApplication.save();
 
@@ -47,62 +56,11 @@ const submitApplication = async (req, res) => {
       message: 'Application submitted successfully',
       data: newApplication,
     });
+
   } catch (error) {
-    console.error('Error submitting application:', error);
+    console.error('❌ Error submitting application:', error);
     res.status(500).json({ message: 'Submission failed', error: error.message });
   }
 };
 
-// @desc    Get all job applications
-// @route   GET /api/applications
-// @access  Admin or Employer
-const getApplications = async (req, res) => {
-  try {
-    const filters = {};
-
-    // Optional query filter: ?jobId=xyz
-    if (req.query.jobId) {
-      filters.jobId = req.query.jobId;
-    }
-
-    const applications = await Application.find(filters)
-      .sort({ createdAt: -1 })
-      .populate({
-        path: 'jobId',
-        select: 'title company'
-      });
-
-    res.status(200).json(applications);
-  } catch (error) {
-    console.error('Error fetching applications:', error);
-    res.status(500).json({ message: 'Failed to fetch applications', error: error.message });
-  }
-};
-
-// @desc    Update application status (select/reject)
-// @route   PUT /api/applications/:id/status
-// @access  Admin or Employer
-const updateApplicationStatus = async (req, res) => {
-  try {
-    const { id } = req.params;
-    const { status } = req.body;
-
-    if (!['pending', 'selected', 'rejected'].includes(status)) {
-      return res.status(400).json({ message: 'Invalid status value' });
-    }
-
-    const updated = await Application.findByIdAndUpdate(id, { status }, { new: true });
-    if (!updated) return res.status(404).json({ message: 'Application not found' });
-
-    res.status(200).json({ message: 'Status updated', data: updated });
-  } catch (error) {
-    console.error('Error updating application status:', error);
-    res.status(500).json({ message: 'Failed to update status', error: error.message });
-  }
-};
-
-module.exports = {
-  submitApplication,
-  getApplications,
-  updateApplicationStatus,
-};
+module.exports = { submitApplication };
