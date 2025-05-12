@@ -2,10 +2,11 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const path = require('path');
-require('dotenv').config(); // ✅ Load .env first
+require('dotenv').config(); // ✅ Load .env
 
 const app = express();
 const routes = require('./routing');
+const jwtkey = process.env.JWT_SECRET;
 
 // Middleware
 app.use(express.urlencoded({ extended: true }));
