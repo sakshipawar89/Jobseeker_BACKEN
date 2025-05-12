@@ -12,7 +12,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // ✅ Fixed CORS (no trailing slash in origin)
-const allowedOrigin = 'https://jobseeker-forntend-g8cx5i4et-sakshipawar89s-projects.vercel.app';
+const allowedOrigin = 'https://jobseeker-forntend.vercel.app/';
 
 app.use(cors({
   origin: allowedOrigin,
